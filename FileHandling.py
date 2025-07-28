@@ -22,14 +22,21 @@ class FileManipulation():
 
         
     def generate_docx(self, filename):
+        if hasattr(sys, '_MEIPASS'):
+            base_directory = sys._MEIPASS  # Path to the folder where bundled files are stored
+        else:
+            base_directory = os.path.dirname(os.path.abspath(__file__))
+        information1_path = os.path.join(base_directory, 'information1.txt')
+        information2_path = os.path.join(base_directory, 'information2.txt')
+        
         today = datetime.date.today()
         doc = Document()
         
         # Add title
-        doc.add_heading('Rest Period Acknowledgment Form', 0)
+        doc.add_heading('Rest Period Acknowledgement Form', 0)
         
         # Add formatted content from information1.txt
-        info1_content = self.read_and_format_file('information1.txt')
+        info1_content = self.read_and_format_file(information1_path)
         self.add_html_content(doc, info1_content)
         
         # Add Table Data
@@ -39,7 +46,7 @@ class FileManipulation():
         doc.add_paragraph("")
         
         # Add formatted content from information2.txt
-        info2_content = self.read_and_format_file('information2.txt')
+        info2_content = self.read_and_format_file(information2_path)
         self.add_html_content(doc, info2_content)
         
         # Add Two Week Table Data
@@ -141,21 +148,14 @@ class FileManipulation():
         doc.add_paragraph()
 
         
-    def delete_doc(self, filename):
-        # grab doc file path of doc
-        directory = os.path.dirname(os.path.abspath(__file__))
-        file_path = os.path.join(directory, filename)
-        
+    def delete_doc(self, filename):        
         # deletes doc file if it exists
-        if os.path.isfile(file_path):
-            os.remove(file_path)
-            print(f"File '{filename}' has been deleted.")
-        else:
-            print(f"File '{filename}' does not exist.")
+        if os.path.isfile(filename):
+            os.remove(filename)
     
     def move_pdf(self, filename):
         # Get the source path (same directory as main.py)
-        source_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), filename)
+        source_path = filename
 
         # Determine the base directory depending on operating system
         if os.name == 'nt':  # Windows
@@ -170,63 +170,100 @@ class FileManipulation():
 
         # Define the rest of the path relative to the base directory
         dates = f"PayPeriod_{start_date}_{end_date}" 
-        #relative_path = f'Special Services Group, LLC\SSG Customer Access - Documents\Babisha Mudaliar\Rest Period Acknowledgment Form\{dates}'
-        relative_path = os.path.join('Special Services Group, LLC', 'SSG Customer Access - Documents', 'Babisha Mudaliar', 'Rest Period Acknowledgment Form' ,dates)
+        relative_path = os.path.join('Special Services Group, LLC', 'SSG Customer Access - Documents', 'Rest Period Acknowledgement Form' ,dates)
 
         # Construct the full destination path
         destination_directory1 = os.path.join(base_directory, relative_path)
         destination_path1 = os.path.join(destination_directory1, filename)
-        destination_directory2 = os.path.join("D:", '\Special Services Group, LLC', 'SSG Customer Access - Documents', 'Babisha Mudaliar', 'Rest Period Acknowledgment Form', dates)
+        destination_directory2 = os.path.join("D:", r'\Special Services Group, LLC', 'SSG Customer Access - Documents', 'Rest Period Acknowledgement Form', dates)
         destination_path2 = os.path.join(destination_directory2, filename)
     
-        destination1_exists = os.path.join(base_directory, 'Special Services Group, LLC', 'SSG Customer Access - Documents', 'Babisha Mudaliar')
-        destination2_exists = os.path.join('D:', '\Special Services Group, LLC', 'SSG Customer Access - Documents', 'Babisha Mudaliar')
+        destination1_exists = os.path.join(base_directory, 'Special Services Group, LLC', 'SSG Customer Access - Documents')
+        destination2_exists = os.path.join('D:', r'\Special Services Group, LLC', 'SSG Customer Access - Documents')
     
         # Check if the source file exists
         if os.path.isfile(source_path):
             # Handle the first destination
             if os.path.exists(destination1_exists):
                 if not os.path.exists(destination_directory1):
-                    print(f"Creating directory: {destination_directory1}")
                     os.makedirs(destination_directory1)  # Create the directory if it does not exist
     
-                try:
-                    shutil.move(source_path, destination_path1)
-                    print(f"File successfully moved to {destination_path1}")
-                except FileNotFoundError:
-                    print("Failed to move the file to destination1.")
-                except Exception as e:
-                    print(f"Error moving file to destination1: {e}")
-            else:
-                print(f"Base path for destination1 does not exist: {destination1_exists}")
+                shutil.move(source_path, destination_path1)
     
             # Handle the second destination
             if os.path.exists(destination2_exists):
                 if not os.path.exists(destination_directory2):
-                    print(f"Creating directory: {destination_directory2}")
                     os.makedirs(destination_directory2)  # Create the directory if it does not exist
     
-                try:
-                    shutil.move(source_path, destination_path2)
-                    print(f"File successfully moved to {destination_path2}")
-                except FileNotFoundError:
-                    print("Failed to move the file to destination2.")
-                except Exception as e:
-                    print(f"Error moving file to destination2: {e}")
-            else:
-                print(f"Base path for destination2 does not exist: {destination2_exists}")
-        else:
-            print("Source file does not exist.")
+                shutil.move(source_path, destination_path2)
         
     def read_and_format_file(self, filename):
-        try:
-            with open(filename, 'r', encoding='utf-8') as file:
-                content = file.read()
-                # Directly return content if it's in proper HTML format
-                return content
-        except FileNotFoundError:
-            return f"Error: The file '{filename}' was not found."
-        except Exception as e:
-            return f"An error occurred: {e}"
+        with open(filename, 'r', encoding='utf-8') as file:
+            content = file.read()
+            # Directly return content if it's in proper HTML format
+            return content
+        
+    def transfer_all_file_button(self):
+        if os.name == 'nt':  # Windows
+            base_directory = os.environ.get('USERPROFILE', '')  # This gets 'C:\Users\Username'
+        elif os.name == 'posix':  # macOS/Linux
+            base_directory = os.environ.get('HOME', '')  # This gets '/home/username'
+        else:
+            raise EnvironmentError('Unsupported operating system')
+            
+        c_path = os.path.join('Special Services Group, LLC', 'SSG Customer Access - Documents', 'Rest Period Acknowledgement Form')
+        d_path = os.path.join("D:", r'\Special Services Group, LLC', 'SSG Customer Access - Documents', 'Rest Period Acknowledgement Form')
+        source1 = os.path.join(base_directory, c_path)
+        source2 = d_path
+        destination1 = os.path.join(base_directory, r"Special Services Group, LLC\SSG Office Admin - Documents\Training - Internal\Rest Period Acknowledgement Form")
+        destination2 = os.path.join('D:', r'\Special Services Group, LLC', 'SSG Office Admin - Documents', 'Training - Internal', 'Rest Period Acknowledgement Form')
+              
+        if os.path.exists(source1):
+            payperiod_folder = os.listdir(source1)
+            for folder in payperiod_folder:
+                folder_path = os.path.join(source1, folder)
+                folder_destination = os.path.join(destination1, folder)
+                
+                if os.path.exists(folder_destination):
+                    # If it exists, copy the contents instead of the folder
+                    for item in os.listdir(folder_path):
+                        source_item = os.path.join(folder_path, item)
+                        destination_item = os.path.join(folder_destination, item)
+                        
+                        if os.path.isdir(source_item):
+                            # If the item is a directory, copy it and its contents
+                            shutil.copytree(source_item, destination_item, dirs_exist_ok=True)
+                        else:
+                            # If the item is a file, copy it
+                            shutil.copy2(source_item, destination_item)
+                    shutil.rmtree(folder_path)
+
+                # This copies the whole payperiod folder with the files in it and copies it to the destination
+                else:
+                    shutil.copytree(folder_path, folder_destination)
+        
+                    # Delete the old folder
+                    shutil.rmtree(folder_path)
+                        
+
+        elif os.path.exists(source2):
+            payperiod_folder = os.listdir(source2)
+            for folder in payperiod_folder:
+                folder_path = os.path.join(source2, folder)
+                folder_destination = os.path.join(destination2, folder)
+                
+                # This copies the whole payperiod folder with the files in it and copies it to the destination
+                shutil.copytree(folder_path, folder_destination)
+    
+                # Delete the old folder
+                shutil.rmtree(folder_path)
+                    
+        else:
+            return False
+        
+        return True
+        
+        
+        
     
         
