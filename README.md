@@ -21,17 +21,14 @@ The Rest Period Compliance Automation Program was developed for a company I work
 
 4. **`information.txt` & `information2.txt`**: These files contain the legal text that informs employees of their rights and responsibilities regarding rest periods. The text is presented to the employee as part of the form completion process.
 
-5. **Batch File (`launch.bat`)**: A batch script that checks for necessary software dependencies, installs them if needed, and then launches the program. It ensures that Python and the required libraries (PyQt5, docx2pdf, python-docx, beautifulsoup4) are installed and up-to-date.
-
 ### Usage Instructions
 
 1. **Installation**:
-   - Ensure Python is installed on your system. The batch file (`launch.bat`) will check for Python and required libraries, and install them if they are not already present.
-   - Run `launch.bat` to start the program.
+   - To generate an new exe use this command. pyinstaller --onefile --noconsole --add-data "information1.txt;." --add-data "information2.txt;." --add-data "Notification_Sound.mp3;." --add-data "ssg_logo.jpg;." --add-data "ssg_logo.png;." --add-data "app_logo.png;." --add-data "memes/*;memes" --icon app_logo.ico main.py
+   - Run `BreakFormApplication v2.1.exe` to start the program. If you generated a new exe it will be called main.exe location in /dist
 
 2. **Running the Program**:
-   - The program will search for the `BreakFormApplication` directory on your C: or D: drive.
-   - Once the program is located, it will open a user-friendly interface where employees can complete and submit their rest period compliance forms.
+   - Once the program is ran, it will open a user-friendly interface where employees can complete and submit their rest period compliance forms.
    - Employees will be prompted to review the information contained in `information.txt` and `information2.txt` to ensure they understand their obligations and rights regarding rest periods.
 
 3. **Form Completion**:
